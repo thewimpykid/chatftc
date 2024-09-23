@@ -26,7 +26,7 @@ export async function POST(req) {
     // Load the PDF document
     let pdfDocs;
     try {
-        const loader = new PDFLoader("GameManual.pdf"); // Adjust the path as needed ./public/GameManual.pdf
+        const loader = new PDFLoader("/GameManual.pdf"); // Adjust the path as needed 
         pdfDocs = await loader.load();
     } catch (error) {
         console.error("Error loading PDF:", error.message);
