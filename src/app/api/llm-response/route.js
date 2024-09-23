@@ -58,7 +58,7 @@ export async function POST(req) {
         const api = new ChatGoogleGenerativeAI({
             model: "gemini-1.5-flash",
             temperature: 0,
-            maxRetries: 2,
+            maxRetries: 0,
         });
 
         // Combine context
