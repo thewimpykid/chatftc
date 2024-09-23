@@ -81,7 +81,7 @@ export async function POST(req) {
         ];
 
         // Get response without streaming
-        const response = await api.call(messages);
+        const response = await api.invoke(messages);
 
         // Update chat history
         chatHistory.push({ role: "assistant", content: response.content });
