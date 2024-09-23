@@ -2,6 +2,7 @@ import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import path from 'path';
 
 // In-memory chat history
 let chatHistory = [];
@@ -26,7 +27,8 @@ export async function POST(req) {
     // Load the PDF document
     let pdfDocs;
     try {
-        const loader = new PDFLoader("/GameManual.pdf"); // Adjust the path as needed
+        const pdfPath = path.resolve(process.cwd(), 'public', 'GameManual.pdf');
+        const loader = new PDFLoader(pdfPath); // Adjust the path as needed
         pdfDocs = await loader.load();
     } catch (error) {
         console.error("Error loading PDF:", error.message);
