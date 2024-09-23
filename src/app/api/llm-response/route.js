@@ -12,6 +12,10 @@ let cachedWebsiteContent2 = null;
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 let lastCacheTime = Date.now();
 
+// Helper function to check if cache has expired
+const cacheExpired = () => Date.now() - lastCacheTime > CACHE_DURATION;
+
+// Load PDF content with caching
 async function loadPdfContent() {
     if (!cachedPdfContent) {
         const pdfPath = path.resolve(process.cwd(), 'public', 'GameManual.pdf');
@@ -22,37 +26,46 @@ async function loadPdfContent() {
     return cachedPdfContent;
 }
 
-async function scrapeWebsite(url) {
+// Scrape website content with optional selector and caching
+async function scrapeWebsite(url, selector = 'body') {
     try {
         const response = await axios.get(url);
         const $ = cheerio.load(response.data);
-        return $("body").text().trim();
+        return $(selector).text().trim();
     } catch (error) {
         console.error(`Error scraping website ${url}:`, error.message);
         return "";
     }
 }
 
-async function getCachedWebsiteContent() {
-    const now = Date.now();
-    if (now - lastCacheTime > CACHE_DURATION) {
-        cachedWebsiteContent1 = await scrapeWebsite("https://www.firstinspires.org/resource-library/ftc/game-and-season-info");
-        cachedWebsiteContent2 = await scrapeWebsite("https://www.ctrlaltftc.com/homeostasis-by-thermal-equilibrium/what-is-homeostasis");
-        lastCacheTime = now;
+// Update cache if expired
+async function ensureCacheIsUpdated() {
+    if (cacheExpired()) {
+        [cachedWebsiteContent1, cachedWebsiteContent2] = await Promise.all([
+            scrapeWebsite("https://www.firstinspires.org/resource-library/ftc/game-and-season-info"),
+            scrapeWebsite("https://www.ctrlaltftc.com/homeostasis-by-thermal-equilibrium/what-is-homeostasis")
+        ]);
+        lastCacheTime = Date.now();
     }
+}
+
+// Get cached website content (parallel content fetching)
+async function getCachedWebsiteContent() {
+    await ensureCacheIsUpdated();
     return `${cachedWebsiteContent1}\n\n${cachedWebsiteContent2}`;
 }
 
+// API handler for POST request
 export async function POST(req) {
     try {
         const reqBody = await req.json();
         const { userInput } = reqBody;
 
-        // Load PDF content
-        const pdfContent = await loadPdfContent();
-
-        // Get cached website content
-        const websiteContent = await getCachedWebsiteContent();
+        // Fetch PDF and website content in parallel
+        const [pdfContent, websiteContent] = await Promise.all([
+            loadPdfContent(),
+            getCachedWebsiteContent()
+        ]);
 
         // Initialize the chatbot
         const api = new ChatGoogleGenerativeAI({
@@ -61,13 +74,17 @@ export async function POST(req) {
             maxRetries: 0,
         });
 
-        // Combine context
+        // Combine the context
         const context = `${pdfContent}\n\n${websiteContent}`;
 
-        // Update chat history
+        // Add user input to chat history
         chatHistory.push({ role: "human", content: userInput });
 
-        // Prepare messages
+        // Limit chat history to the most recent entries (e.g., last 10 exchanges)
+        const MAX_HISTORY_SIZE = 10;
+        chatHistory = chatHistory.slice(-MAX_HISTORY_SIZE);
+
+        // Prepare messages (only assistant responses from chat history)
         const messages = [
             {
                 role: "system",
@@ -76,17 +93,21 @@ export async function POST(req) {
             {
                 role: "human",
                 content: `${context}\n\nUser: ${userInput}`,
-            },
-            ...chatHistory.map(entry => ({ role: entry.role, content: entry.content })),
+            }
         ];
 
-        // Get response without streaming
+        // Append assistant responses from chat history
+        chatHistory.filter(entry => entry.role === 'assistant').forEach(entry => {
+            messages.push({ role: entry.role, content: entry.content });
+        });
+
+        // Get response from the chatbot
         const response = await api.invoke(messages);
 
-        // Update chat history
+        // Add the assistant's response to chat history
         chatHistory.push({ role: "assistant", content: response.content });
 
-        // Respond
+        // Respond to the user
         return new Response(JSON.stringify({ response: response.content }), {
             headers: { 'Content-Type': 'application/json' },
         });
