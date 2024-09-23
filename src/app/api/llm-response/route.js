@@ -80,22 +80,14 @@ export async function POST(req) {
             ...chatHistory.map(entry => ({ role: entry.role, content: entry.content })),
         ];
 
-        // Stream response
-        const stream = await api.stream(messages);
-
-        const chunks = [];
-        for await (const chunk of stream) {
-            chunks.push(chunk.content);
-            console.log(chunk.content);
-        }
-
-        const finalResponse = chunks.join("");
+        // Get response without streaming
+        const response = await api.call(messages);
 
         // Update chat history
-        chatHistory.push({ role: "assistant", content: finalResponse });
+        chatHistory.push({ role: "assistant", content: response.content });
 
         // Respond
-        return new Response(JSON.stringify({ response: finalResponse }), {
+        return new Response(JSON.stringify({ response: response.content }), {
             headers: { 'Content-Type': 'application/json' },
         });
     } catch (error) {
