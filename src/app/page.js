@@ -15,6 +15,8 @@ export default function Home() {
     ];
 
     const handleChat = async (input) => {
+        if (loading || !input.trim()) return; // Prevent sending if loading or input is empty
+
         setLoading(true);
         const res = await fetch('/api/llm-response', {
             method: 'POST',
@@ -49,6 +51,12 @@ export default function Home() {
     const handleExampleQuestion = (question) => {
         setUserInput(question);
         handleChat(question);
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleChat(userInput);
+        }
     };
 
     return (
@@ -107,14 +115,17 @@ export default function Home() {
                         type="text"
                         value={userInput}
                         onChange={(e) => setUserInput(e.target.value)}
+                        onKeyDown={handleKeyPress}
                         placeholder="Ask something..."
                         className="flex-grow bg-gray-700 text-gray-100 p-3 rounded-l-lg focus:outline-none focus:ring focus:ring-blue-500 shadow-md" // Set padding for height
                         style={{ minHeight: '48px' }} // Set minimum height
+                        disabled={loading} // Disable input when loading
                     />
                     <button
                         onClick={() => handleChat(userInput)}
-                        className="bg-blue-600 text-white px-4 rounded-r-lg hover:bg-blue-500 transition shadow-md" // Added shadow
+                        className={`bg-blue-600 text-white px-4 rounded-r-lg transition shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-500'}`}
                         style={{ minHeight: '48px' }} // Set minimum height
+                        disabled={loading} // Disable button when loading
                     >
                         Send
                     </button>
