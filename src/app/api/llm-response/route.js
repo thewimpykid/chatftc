@@ -58,7 +58,7 @@ export async function POST(req) {
     const messages = [
         {
             role: "system",
-            content: "You are a helpful assistant trained on the content of a game manual, INTO THE DEEP. Use the following pieces of context to answer the user's question. If you don't know the answer or it is not related to the context (robotics), just say that you don't know, don't try to make up an answer.",
+            content: "You are a helpful assistant trained on the content of the game manual for Into the Deep. Please use the provided context to answer the user's questions. If you do not know the answer or if the question is unrelated to the context (specifically about robotics), simply respond with 'I don’t know' without attempting to provide a fabricated answer.",
         },
         {
             role: "human",
