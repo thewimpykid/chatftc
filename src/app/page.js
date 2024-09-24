@@ -6,6 +6,7 @@ export default function Home() {
     const [chatOutput, setChatOutput] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showExamples, setShowExamples] = useState(true);
+    const [loadingMessage, setLoadingMessage] = useState(''); // State for loading message
 
     // Reference for the chat container to auto-scroll
     const chatContainerRef = useRef(null);
@@ -33,6 +34,11 @@ export default function Home() {
         if (loading || !input.trim()) return; // Prevent sending if loading or input is empty
 
         setLoading(true);
+        setLoadingMessage(''); // Reset loading message
+        const loadingTimeout = setTimeout(() => {
+            setLoadingMessage('It’s taking a bit more than usual...');
+        }, 10000); // Set timeout for 5 seconds
+
         const res = await fetch('/api/llm-response', {
             method: 'POST',
             headers: {
@@ -41,8 +47,10 @@ export default function Home() {
             body: JSON.stringify({ userInput: input }),
         });
 
+        clearTimeout(loadingTimeout); // Clear timeout if response is received
         const data = await res.json();
         setLoading(false);
+        setLoadingMessage(''); // Clear loading message after response
 
         if (res.ok) {
             const formattedResponse = data.response
@@ -105,6 +113,7 @@ export default function Home() {
                                         <div className="animate-spin h-5 w-5 border-4 border-blue-600 border-t-transparent rounded-full"></div>
                                         <span className="ml-2">Loading...</span>
                                     </div>
+                                    {loadingMessage && <p className="text-gray-400 text-sm ml-2">{loadingMessage}</p>} {/* Loading message */}
                                 </div>
                             )}
                         </div>
