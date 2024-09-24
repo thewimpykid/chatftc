@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export default function Home() {
     const [userInput, setUserInput] = useState('');
@@ -7,12 +7,27 @@ export default function Home() {
     const [loading, setLoading] = useState(false);
     const [showExamples, setShowExamples] = useState(true);
 
+    // Reference for the chat container to auto-scroll
+    const chatContainerRef = useRef(null);
+
     const exampleQuestions = [
         "What is the FTC Game Manual?",
         "How do I register my team?",
         "What are the rules for this year's competition?",
         "Can you explain the different roles in a robotics team?"
     ];
+
+    // Function to auto-scroll to the bottom of the chat
+    const scrollToBottom = () => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    };
+
+    // Scroll to the bottom whenever chatOutput changes
+    useEffect(() => {
+        scrollToBottom();
+    }, [chatOutput]);
 
     const handleChat = async (input) => {
         if (loading || !input.trim()) return; // Prevent sending if loading or input is empty
@@ -43,6 +58,9 @@ export default function Home() {
             ]);
             setUserInput('');
             setShowExamples(false);
+
+            // Scroll to bottom after the question is asked
+            scrollToBottom();
         } else {
             console.error(data.error);
         }
@@ -72,7 +90,7 @@ export default function Home() {
             {/* Chat Area */}
             <div className="border border-gray-700 rounded-lg w-full max-w-4xl h-128 overflow-hidden bg-gray-800 shadow-md mt-4 mb-16 flex-grow">
                 <div className="h-full flex flex-col">
-                    <div className="flex-grow overflow-y-auto p-4">
+                    <div ref={chatContainerRef} className="flex-grow overflow-y-auto p-4">
                         <div className="flex flex-col space-y-4">
                             {chatOutput.map((message, index) => (
                                 <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>

@@ -39,8 +39,6 @@ export async function POST(req) {
     }
 
     // Scrape content from both websites
-    const websiteContent1 = await scrapeWebsite("https://www.firstinspires.org/resource-library/ftc/game-and-season-info");
-    const websiteContent2 = await scrapeWebsite("https://www.ctrlaltftc.com/homeostasis-by-thermal-equilibrium/what-is-homeostasis");
     // const websiteContent3 = await scrapeWebsite("https://ftcscout.org/teams");
 
     // Initialize the Google Generative AI chatbot
@@ -51,7 +49,7 @@ export async function POST(req) {
     });
 
     // Combine all page contents into a single string
-    const context = pdfDocs.map(doc => doc.pageContent).join("\n") + "\n\n" + websiteContent1 + "\n\n" + websiteContent2
+    const context = pdfDocs.map(doc => doc.pageContent).join("\n")
 
     // Add user input to chat history
     chatHistory.push({ role: "human", content: userInput });
