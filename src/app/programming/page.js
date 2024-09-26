@@ -1,4 +1,5 @@
 "use client";
+import Link from 'next/link'; 
 import { useState, useRef, useEffect } from 'react';
 
 export default function Programming() {
@@ -87,7 +88,16 @@ export default function Programming() {
             {/* Full-Width Title */}
             <div className="w-full bg-gray-800 p-4 fixed top-0 left-0 shadow-lg flex justify-center items-center">
                 <h1 className="text-3xl font-bold text-center mr-6">ChatFTC</h1>
+                <nav className="ml-12">
+                    <Link href="/" className="text-gray-100 hover:text-gray-300 text-lg" passHref>
+                        Game Manual
+                    </Link>
+                    <Link href="/programming" className="text-gray-100 hover:text-gray-300 text-lg ml-12  font-bold" passHref>
+                        Programming
+                    </Link>
+                </nav>
             </div>
+            
 
             {/* Watermark */}
             <h1 className="text-l text-gray-400 mt-16 text-center">Created by Meer Patel from MakEMinds #23786</h1>

@@ -108,7 +108,7 @@ export async function POST(req) {
     const messages = [
         {
             role: "system",
-            content: "You are a helpful assistant trained on the content of the game manual, FTC documentation, and Roadrunner. Answer user questions using this knowledge. If you don't know the answer or if the question is unrelated, say 'I don’t know.'",
+            content: "You are a helpful assistant trained on the content of the game manual, FTC documentation, and Roadrunner. Answer user questions using this knowledge. If you don't know the answer or if the question is unrelated, don't make up an answer."
         },
         {
             role: "human",
