@@ -3,6 +3,7 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import path from 'path';
+import { RecursiveCharacterTextSplitter } from "@langchain/text_splitter";
 
 // In-memory chat history
 let chatHistory = [];
@@ -64,6 +65,16 @@ async function loadWebsiteContent(urls) {
     return content;
 }
 
+// Function to split content into chunks using RecursiveCharacterTextSplitter
+async function splitContentIntoChunks(content) {
+    const splitter = new RecursiveCharacterTextSplitter({
+        chunkSize: 1000,  // Adjust chunk size as needed
+        chunkOverlap: 200, // Overlap between chunks
+    });
+    const chunks = await splitter.splitText(content);
+    return chunks;
+}
+
 export async function POST(req) {
     const reqBody = await req.json();
     const { userInput } = reqBody;
@@ -88,10 +99,13 @@ export async function POST(req) {
     const roadrunnerContent = await loadWebsiteContent(roadrunnerUrls);
 
     // Combine all content (PDF, FTC website, and Roadrunner website)
-    const context = pdfContent + "\n" + ftcContent + "\n" + roadrunnerContent;
+    const fullContext = pdfContent + "\n" + ftcContent + "\n" + roadrunnerContent;
 
-    // Limit the context size to avoid large input issues
-    const truncatedContext = context.slice(0, 5000); // Adjust limit as needed
+    // Split the content into chunks
+    const contentChunks = await splitContentIntoChunks(fullContext);
+
+    // Limit the context size to avoid large input issues (optional step if needed)
+    const truncatedContext = contentChunks.slice(0, 5).join("\n"); // Adjust limit as needed
 
     // Add user input to chat history
     chatHistory.push({ role: "human", content: userInput });
