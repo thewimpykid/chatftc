@@ -11,10 +11,10 @@ export default function Programming() {
     const chatContainerRef = useRef(null);
 
     const exampleQuestions = [
-        "What is the FTC Game Manual?",
-        "How do I register my team?",
-        "What are the rules for this year's competition?",
-        "Can you explain the different roles in a robotics team?"
+        "How do I program autonomous mode using FTC SDK?",
+        "What is the difference between LinearOpMode and OpMode in FTC programming?",
+        "How can I use the Road Runner library for trajectory planning in FTC?",
+        "What are the best practices for using sensors like IMU and encoders in FTC code?"
     ];
 
     const scrollToBottom = () => {
