@@ -1,14 +1,13 @@
 "use client";
 import { useState, useRef, useEffect } from 'react';
 
-export default function Home() {
+export default function Programming() {
     const [userInput, setUserInput] = useState('');
     const [chatOutput, setChatOutput] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showExamples, setShowExamples] = useState(true);
     const [loadingMessage, setLoadingMessage] = useState(''); // State for loading message
 
-    // Reference for the chat container to auto-scroll
     const chatContainerRef = useRef(null);
 
     const exampleQuestions = [
@@ -18,28 +17,26 @@ export default function Home() {
         "Can you explain the different roles in a robotics team?"
     ];
 
-    // Function to auto-scroll to the bottom of the chat
     const scrollToBottom = () => {
         if (chatContainerRef.current) {
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
     };
 
-    // Scroll to the bottom whenever chatOutput changes
     useEffect(() => {
         scrollToBottom();
     }, [chatOutput]);
 
     const handleChat = async (input) => {
-        if (loading || !input.trim()) return; // Prevent sending if loading or input is empty
+        if (loading || !input.trim()) return;
 
         setLoading(true);
-        setLoadingMessage(''); // Reset loading message
+        setLoadingMessage('');
         const loadingTimeout = setTimeout(() => {
             setLoadingMessage('It’s taking a bit more than usual...');
-        }, 5000); // Set timeout for 5 seconds
+        }, 5000);
 
-        const res = await fetch('/api/llm-response', {
+        const res = await fetch('/api/llm-response/programming', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -47,13 +44,14 @@ export default function Home() {
             body: JSON.stringify({ userInput: input }),
         });
 
-        clearTimeout(loadingTimeout); // Clear timeout if response is received
+        clearTimeout(loadingTimeout);
         const data = await res.json();
         setLoading(false);
-        setLoadingMessage(''); // Clear loading message after response
+        setLoadingMessage('');
 
         if (res.ok) {
             const formattedResponse = data.response
+                .replace(/```([\s\S]*?)```/g, (_, code) => `<pre class="chatgpt-code"><code>${code}</code></pre>`)
                 .replace(/(?<!\*)\*\*(.+?)\*\*(?!:)/g, '<strong>$1</strong>')
                 .replace(/\* (.+?)(?=\n|\r)/g, '<li>$1</li>')
                 .replace(/<li>/g, '<li class="list-disc ml-5">')
@@ -67,7 +65,6 @@ export default function Home() {
             setUserInput('');
             setShowExamples(false);
 
-            // Scroll to bottom after the question is asked
             scrollToBottom();
         } else {
             console.error(data.error);
@@ -113,7 +110,7 @@ export default function Home() {
                                         <div className="animate-spin h-5 w-5 border-4 border-blue-600 border-t-transparent rounded-full"></div>
                                         <span className="ml-2">Loading...</span>
                                     </div>
-                                    {loadingMessage && <p className="text-gray-400 text-sm ml-2">{loadingMessage}</p>} {/* Loading message */}
+                                    {loadingMessage && <p className="text-gray-400 text-sm ml-2">{loadingMessage}</p>}
                                 </div>
                             )}
                         </div>
@@ -144,15 +141,15 @@ export default function Home() {
                         onChange={(e) => setUserInput(e.target.value)}
                         onKeyDown={handleKeyPress}
                         placeholder="Ask something..."
-                        className="flex-grow bg-gray-700 text-gray-100 p-3 rounded-l-lg focus:outline-none focus:ring focus:ring-blue-500 shadow-md" // Set padding for height
-                        style={{ minHeight: '48px' }} // Set minimum height
-                        disabled={loading} // Disable input when loading
+                        className="flex-grow bg-gray-700 text-gray-100 p-3 rounded-l-lg focus:outline-none focus:ring focus:ring-blue-500 shadow-md"
+                        style={{ minHeight: '48px' }}
+                        disabled={loading}
                     />
                     <button
                         onClick={() => handleChat(userInput)}
                         className={`bg-blue-600 text-white px-4 rounded-r-lg transition shadow-md ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-500'}`}
-                        style={{ minHeight: '48px' }} // Set minimum height
-                        disabled={loading} // Disable button when loading
+                        style={{ minHeight: '48px' }}
+                        disabled={loading}
                     >
                         Send
                     </button>

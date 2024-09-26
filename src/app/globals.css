@@ -3,3 +3,20 @@
 @tailwind utilities;
 
 
+.chatgpt-code {
+    background-color: #2d2d2d;
+    color: #f8f8f2;
+    padding: 1em;
+    border-radius: 0.5em;
+    font-family: 'Fira Code', monospace;
+    overflow-x: auto;
+    max-width: 100%;
+    white-space: pre-wrap;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    line-height: 1.5;
+}
+
+pre code {
+    font-size: 0.9rem;
+}
