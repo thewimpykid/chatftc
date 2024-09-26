@@ -3,7 +3,7 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import path from 'path';
-import { RecursiveCharacterTextSplitter } from "@langchain/text_splitter";
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 
 // In-memory chat history
 let chatHistory = [];
