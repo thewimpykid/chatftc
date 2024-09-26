@@ -1,7 +1,6 @@
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import axios from 'axios';
-import * as cheerio from 'cheerio';
+
 import path from 'path';
 
 // In-memory chat history
