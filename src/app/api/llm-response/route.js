@@ -8,17 +8,7 @@ import path from 'path';
 let chatHistory = [];
 
 // Function to scrape website content
-async function scrapeWebsite(url) {
-    try {
-        const response = await axios.get(url);
-        const $ = cheerio.load(response.data);
-        const text = $("body").text().trim(); // Simplified text extraction
-        return text;
-    } catch (error) {
-        console.error(`Error scraping website ${url}:`, error.message);
-        return ""; // Return empty string if there's an error
-    }
-}
+
 
 export async function POST(req) {
     const reqBody = await req.json();
