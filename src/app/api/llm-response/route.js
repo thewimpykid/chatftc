@@ -1,13 +1,20 @@
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-
 import path from 'path';
 
 // In-memory chat history
 let chatHistory = [];
 
-// Function to scrape website content
-
+// Function to split content using RecursiveCharacterTextSplitter
+async function splitContent(text) {
+    const splitter = new RecursiveCharacterTextSplitter({
+        chunkSize: 1000,   // Adjust chunk size as needed
+        chunkOverlap: 200, // Overlap between chunks for continuity
+    });
+    const chunks = await splitter.splitText(text);
+    return chunks.join("\n"); // Join chunks back to string or keep as an array if needed
+}
 
 export async function POST(req) {
     const reqBody = await req.json();
@@ -27,8 +34,11 @@ export async function POST(req) {
         });
     }
 
-    // Scrape content from both websites
-    // const websiteContent3 = await scrapeWebsite("https://ftcscout.org/teams");
+    // Combine all PDF page contents into a single string
+    const combinedContent = pdfDocs.map(doc => doc.pageContent).join("\n");
+
+    // Use the recursive text splitter to chunk the content
+    const context = await splitContent(combinedContent);
 
     // Initialize the Google Generative AI chatbot
     const api = new ChatGoogleGenerativeAI({
@@ -36,9 +46,6 @@ export async function POST(req) {
         temperature: 0,
         maxRetries: 2,
     });
-
-    // Combine all page contents into a single string
-    const context = pdfDocs.map(doc => doc.pageContent).join("\n")
 
     // Add user input to chat history
     chatHistory.push({ role: "human", content: userInput });
@@ -84,5 +91,3 @@ export async function POST(req) {
         });
     }
 }
-
-// content: "You are a helpful assistant trained on the content of a game manual, INTO THE DEEP. Use the following pieces of context to answer the user's question. If you don't know the answer or it is not related to the context (robotics), just say that you don't know, don't try to make up an answer.",
