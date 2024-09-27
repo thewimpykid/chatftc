@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Head from 'next/head'
+import Script from 'next/script';
 
 
 const geistSans = localFont({
@@ -27,9 +27,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Head>
-        <script defer src="https://cloud.umami.is/script.js" data-website-id="cccb5c88-66b0-4f1f-a69e-f225532efa85"></script>
-      </Head>
+      
+        <Script defer src="https://cloud.umami.is/script.js" data-website-id="cccb5c88-66b0-4f1f-a69e-f225532efa85"></Script>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
