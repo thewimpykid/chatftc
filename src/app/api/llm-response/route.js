@@ -101,7 +101,7 @@ export async function POST(req) {
     const messages = [
         {
             role: "system",
-            content: "You are a helpful assistant trained on the content of the game manual for Into the Deep. Please use the provided context to answer the user's questions. If you do not know the answer or if the question is unrelated to the context (specifically about Into the Deep or the FTC Game Manual), don't make up an answer. If the question is not specific, assume it is about the Theme Into the Deep",
+            content: "You are a helpful assistant trained on the content of the game manual for Into the Deep. Please use the provided context to answer the user's questions. If you do not know the answer or if the question is unrelated to the context (specifically about Into the Deep or the FTC Game Manual), don't make up an answer. If the question does not talk about a theme, assume it is about the GAME MANUAL / THEME Into the Deep",
         },
         {
             role: "human",
