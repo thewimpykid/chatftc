@@ -7,6 +7,7 @@ import path from 'path';
 // In-memory storage for embeddings and chat history
 let chatHistory = [];
 let pdfEmbeddings = [];
+let pdfChunks = []; // To store chunks of content
 
 // Function to split content using RecursiveCharacterTextSplitter
 async function splitContent(text) {
@@ -60,6 +61,7 @@ export async function POST(req) {
 
             const combinedContent = pdfDocs.map(doc => doc.pageContent).join("\n");
             const chunks = await splitContent(combinedContent);
+            pdfChunks = chunks; // Store text chunks for retrieval later
 
             // Create embeddings for the document chunks
             const embedModel = new GoogleGenerativeAIEmbeddings({
@@ -85,7 +87,7 @@ export async function POST(req) {
 
     // Find the most relevant chunk based on the user query
     const relevantChunkIndex = findRelevantChunk(userEmbedding, pdfEmbeddings);
-    const relevantContext = pdfEmbeddings[relevantChunkIndex];
+    const relevantContext = pdfChunks[relevantChunkIndex]; // Retrieve the actual content, not the embedding
 
     // Initialize the Google Generative AI chatbot
     const api = new ChatGoogleGenerativeAI({
@@ -101,11 +103,11 @@ export async function POST(req) {
     const messages = [
         {
             role: "system",
-            content: "You are a helpful assistant trained on the content of the game manual for Into the Deep. Please use the provided context to answer the user's questions. If you do not know the answer or if the question is unrelated to the context (specifically about Into the Deep or the FTC Game Manual), don't make up an answer. If the question does not talk about a theme, assume it is about the GAME MANUAL / THEME Into the Deep",
+            content: "You are a helpful assistant trained on the content of the game manual for Into the Deep. Please use the provided context to answer the user's questions. If you do not know the answer or if the question is unrelated to the context (specifically about Into the Deep or the FTC Game Manual), don't make up an answer.",
         },
         {
             role: "human",
-            content: `${relevantContext}\n\nUser: ${userInput}`,
+            content: `Relevant Context: ${relevantContext}\n\nUser: ${userInput}`,
         },
         ...chatHistory.map(entry => ({ role: entry.role, content: entry.content })),
     ];
