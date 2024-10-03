@@ -12,7 +12,7 @@ let pdfChunks = []; // To store chunks of content
 // Function to split content using RecursiveCharacterTextSplitter
 async function splitContent(text) {
     const splitter = new RecursiveCharacterTextSplitter({
-        chunkSize: 1000,
+        chunkSize: 10000,
         chunkOverlap: 200,
     });
     return await splitter.splitText(text);
