@@ -93,13 +93,14 @@ export async function POST(req) {
     // Get all URLs from both the FTC Javadoc and the learnroadrunner websites
     const ftcUrls = await getUrlsFromIndexPage("https://ftctechnh.github.io/ftc_app/doc/javadoc/index.html");
     const roadrunnerUrls = await getUrlsFromIndexPage("https://learnroadrunner.com/");
+    const homeostasisUrls = await getUrlsFromIndexPage("https://www.ctrlaltftc.com/");
 
     // Scrape content from both websites
     const ftcContent = await loadWebsiteContent(ftcUrls);
     const roadrunnerContent = await loadWebsiteContent(roadrunnerUrls);
 
     // Combine all content (PDF, FTC website, and Roadrunner website)
-    const fullContext = pdfContent + "\n" + ftcContent + "\n" + roadrunnerContent;
+    const fullContext = pdfContent + "\n" + ftcContent + "\n" + roadrunnerContent + "\n" + homeostasisUrls;
 
     // Split the content into chunks
     const contentChunks = await splitContentIntoChunks(fullContext);
