@@ -15,8 +15,6 @@ export default function Home() {
     const exampleQuestions = [
         "What is the FTC Game Manual?",
         "How do I register my team?",
-        "What are the rules for this year's competition?",
-        "Can you explain the different roles in a robotics team?"
     ];
 
     // Function to auto-scroll to the bottom of the chat
